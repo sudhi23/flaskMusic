@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect,  url_for
+from flask import Flask, render_template, request, redirect,  url_for, send_from_directory
 from flask.helpers import flash
 import mysql.connector
 from mysql.connector import errorcode
@@ -73,6 +73,7 @@ def upload():
         cnx.commit()
         f = request.files['file']
         f.save('static/songs/{}.mp3'.format(id))
+        return redirect(url_for('home'))
     return render_template('uploadForm.html')
 
 @app.route('/play/<id>', methods=['GET'])
@@ -97,6 +98,11 @@ def search():
         cursor.execute(query)
         return render_template('search.html', cursor=cursor)
     return render_template('search.html', cursor=None)
+
+@app.route('/download/<id>', methods=['GET'])
+def download(id):
+    return send_from_directory('static/songs/','{}.mp3'.format(id), as_attachment = True, download_name='{}.mp3'.format(request.args['song']))
+
 app.run(debug=True)
 cursor.close()
 cnx.close()
