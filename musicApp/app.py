@@ -90,6 +90,13 @@ def delete(id):
     os.remove('static/songs/{}.mp3'.format(id))
     return redirect(url_for('home'))
 
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+    if request.method == 'POST':
+        query = ("SELECT * FROM {} WHERE {} = '{}' ".format(TABLE_NAME, request.form['in'], request.form['query']))
+        cursor.execute(query)
+        return render_template('search.html', cursor=cursor)
+    return render_template('search.html', cursor=None)
 app.run(debug=True)
 cursor.close()
 cnx.close()
