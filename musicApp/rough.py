@@ -1,9 +1,10 @@
-# from __future__ import print_function
+from __future__ import print_function
 
-# import mysql.connector
-# from mysql.connector import errorcode
+import mysql.connector
+from mysql.connector import errorcode
 
-# DB_NAME = 'music'
+DB_NAME = 'music'
+TABLE_NAME = 'songs'
 
 # TABLES = {}
 # TABLES['songs'] = (
@@ -15,8 +16,8 @@
 #     "  PRIMARY KEY (`id`)"
 #     ") ENGINE=InnoDB")
 
-# cnx = mysql.connector.connect(user='root')
-# cursor = cnx.cursor(buffered=True)
+cnx = mysql.connector.connect(user='root', database=DB_NAME)
+cursor = cnx.cursor(buffered=True)
     
 # def create_database(cursor):
 #     try:
@@ -62,6 +63,13 @@
 # cursor.execute(add_song, data_song)
 # print(cursor.lastrowid)
 
+query = ("SELECT * FROM {} ".format(TABLE_NAME))
+
+cursor.execute(query)
+
+for (id, song, artist, album) in cursor:
+  print(id, song, artist, album)
+
 # cnx.commit()
-# cursor.close()
-# cnx.close()
+cursor.close()
+cnx.close()

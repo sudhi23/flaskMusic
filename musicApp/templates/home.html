@@ -10,6 +10,15 @@
 
 <body>
     <h1>Home</h1>
+    <ul>
+        {% for (id, song, artist, album) in cursor %}
+        <li>
+            <a href="/play/{{ id }}">{{ song }}</a><br>
+            <span>{{artist}}</span><br>
+            <span>{{album}}</span><br>
+        </li>
+        {% endfor %}
+    </ul>
 </body>
 
 </html>

@@ -3,6 +3,7 @@ import mysql.connector
 from mysql.connector import errorcode
 
 DB_NAME = 'music'
+TABLE_NAME = 'songs'
 
 TABLES = {}
 TABLES['songs'] = (
@@ -54,14 +55,16 @@ app = Flask(__name__)
 
 @app.route('/home')
 def home():
-    return render_template('home.html')
+    query = ("SELECT * FROM {} ".format(TABLE_NAME))
+    cursor.execute(query)
+    return render_template('home.html', cursor=cursor)
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
     if request.method == 'POST':
-        add_song = ("INSERT INTO songs "
+        add_song = ("INSERT INTO {} "
                "(title, artist, album) "
-               "VALUES (%s, %s, %s)")
+               "VALUES (%s, %s, %s)".format(TABLE_NAME))
         data_song = list(request.form.values())
         cursor.execute(add_song, data_song)
         id = cursor.lastrowid
@@ -70,7 +73,6 @@ def upload():
     return render_template('uploadForm.html')
 
 app.run(debug=True)
-
 cnx.commit()
 cursor.close()
 cnx.close()
