@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, url_for
 import mysql.connector
 from mysql.connector import errorcode
 
@@ -71,6 +71,16 @@ def upload():
         f = request.files['file']
         f.save('static/songs/{}.mp3'.format(id))
     return render_template('uploadForm.html')
+
+@app.route('/play/<id>')
+def play(id):
+    query = ("SELECT * FROM {} WHERE id = {} ".format(TABLE_NAME, id))
+    cursor.execute(query)
+    _, song, artist, album = list(cursor)[0]
+    return render_template('play.html', id=id, song=song, artist=artist, album=album)
+
+with app.test_request_context():
+    print(url_for('play', id=1, details=('Madhurashtakam', 'Agam', 'Bhagwan')))
 
 app.run(debug=True)
 cnx.commit()

@@ -63,13 +63,18 @@ cursor = cnx.cursor(buffered=True)
 # cursor.execute(add_song, data_song)
 # print(cursor.lastrowid)
 
-query = ("SELECT * FROM {} ".format(TABLE_NAME))
+# query = ("SELECT * FROM {} ".format(TABLE_NAME))
 
-cursor.execute(query)
+# cursor.execute(query)
 
-for (id, song, artist, album) in cursor:
-  print(id, song, artist, album)
+# query = ("SELECT * FROM {} WHERE id = {} ".format(TABLE_NAME, 1))
+# cursor.execute(query)
+
+# print(list(cursor)[0])
+
+#for (id, song, artist, album) in cursor:
+#    print(id, song, artist, album)
 
 # cnx.commit()
-cursor.close()
-cnx.close()
+# cursor.close()
+# cnx.close()
