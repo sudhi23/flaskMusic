@@ -1,8 +1,13 @@
-from flask import Flask, render_template, request, redirect,  url_for, send_from_directory
-from flask.helpers import flash
+from flask import Flask, render_template, request, redirect,  url_for, send_from_directory, flash
 import mysql.connector
 from mysql.connector import errorcode
 import os
+
+UPLOAD_FOLDER = 'static/songs'
+ALLOWED_EXTENSIONS = {'mp3'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 DB_NAME = 'music'
 TABLE_NAME = 'songs'
@@ -54,6 +59,7 @@ for table_name in TABLES:
         print("OK")
 
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route('/home', methods=['GET'])
 def home():
@@ -64,6 +70,11 @@ def home():
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
     if request.method == 'POST':
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            return redirect(url_for('upload'))
+        f = request.files['file']
+
         add_song = ("INSERT INTO {} "
                "(title, artist, album) "
                "VALUES (%s, %s, %s)".format(TABLE_NAME))
@@ -71,16 +82,26 @@ def upload():
         cursor.execute(add_song, data_song)
         id = cursor.lastrowid
         cnx.commit()
-        f = request.files['file']
-        f.save('static/songs/{}.mp3'.format(id))
+        
+        # If the user does not select a file, the browser submits an
+        # empty file without a filename.
+        if f.filename == '':
+            return redirect(url_for('upload'))
+        if f and allowed_file(f.filename):
+            f.save(os.path.join(app.config['UPLOAD_FOLDER'], '{}.mp3'.format(id)))
         return redirect(url_for('home'))
     return render_template('uploadForm.html')
 
 @app.route('/play/<id>', methods=['GET'])
 def play(id):
-    query = ("SELECT * FROM {} WHERE id = {} ".format(TABLE_NAME, id))
-    cursor.execute(query)
-    _, song, artist, album = list(cursor)[0]
+    if 'song' in request.args:
+        song = request.args['song']
+        artist = request.args['artist']
+        album = request.args['album']
+    else:
+        query = ("SELECT * FROM {} WHERE id = {} ".format(TABLE_NAME, id))
+        cursor.execute(query)
+        _, song, artist, album = list(cursor)[0]
     return render_template('play.html', id=id, song=song, artist=artist, album=album)
 
 @app.route('/delete/<id>', methods=['GET'])
@@ -88,7 +109,8 @@ def delete(id):
     query = ("DELETE FROM {} WHERE id = {} ".format(TABLE_NAME, id))
     cursor.execute(query)
     cnx.commit()
-    os.remove('static/songs/{}.mp3'.format(id))
+    os.remove(os.path.join(app.config['UPLOAD_FOLDER'], '{}.mp3'.format(id)))
+    flash('Deleted')
     return redirect(url_for('home'))
 
 @app.route('/search', methods=['GET', 'POST'])
@@ -101,7 +123,7 @@ def search():
 
 @app.route('/download/<id>', methods=['GET'])
 def download(id):
-    return send_from_directory('static/songs/','{}.mp3'.format(id), as_attachment = True, download_name='{}.mp3'.format(request.args['song']))
+    return send_from_directory(app.config['UPLOAD_FOLDER'],'{}.mp3'.format(id), as_attachment = True, download_name='{}.mp3'.format(request.args['song']))
 
 app.run(debug=True)
 cursor.close()

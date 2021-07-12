@@ -5,19 +5,25 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/upload.css">
     <title>Music Manager</title>
 </head>
 
 <body>
-    <h1>Upload</h1>
-    <a href="{{url_for('home')}}">Home</a>
+    <div class="h1">Manage Music</div>
+    <div class="h3">Upload</div>
+    <div class="links">
+        <a href="{{url_for('home')}}">Home</a>
+    </div>
+    <div class="form">
     <form enctype="multipart/form-data" method="post">
-        <input type="text" name="song" id="song" placeholder="SONG"><br>
-        <input type="text" name="artist" id="artist" placeholder="ARTIST"><br>
-        <input type="text" name="album" id="album" placeholder="ALBUM"><br>
-        <input type="file" name="file" id="file"><br>
-        <input type="submit">
+        <input type="text" name="song" id="song" placeholder="SONG">
+        <input type="text" name="artist" id="artist" placeholder="ARTIST">
+        <input type="text" name="album" id="album" placeholder="ALBUM">
+        <input type="file" name="file" id="file">
+        <input type="submit" id="submit" >
     </form>
+</div>
 </body>
 
 </html>

@@ -1,0 +1,73 @@
+* {
+  padding: 0;
+  margin: 0;
+}
+
+*:focus {
+  outline: none;
+}
+
+.h1 {
+  background-color: rgb(94, 92, 91);
+  color: rgb(247, 247, 247);
+  font-size: 72px;
+  font-family: monospace;
+  text-align: center;
+}
+
+.h3 {
+  background-color: rgb(162, 226, 235);
+  color: rgb(26, 24, 24);
+  font-size: 56px;
+  padding-left: 10vw;
+  font-family: monospace;
+}
+
+.links {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 2vh 10vw;
+}
+
+.links > a {
+  border: 1px solid black;
+  flex: 0.3;
+  color: black;
+  font-size: 24px;
+  text-align: center;
+  padding: 2vh 0;
+  font-family: monospace;
+  text-decoration: none;
+  border-radius: 20px;
+}
+
+.maincontainer {
+  height: 65vh;
+  font-family: monospace;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+.image {
+  flex: 0.65;
+}
+
+.song {
+  flex: 0.1;
+  font-size: 48px;
+  padding: 0 10vw;
+}
+
+.details {
+  flex: 0.1;
+  font-size: 32px;
+  padding: 0 10vw;
+}
+
+.maincontainer > audio {
+  flex: 0.1;
+  padding: 0 10vw;
+  width: 70%;
+}

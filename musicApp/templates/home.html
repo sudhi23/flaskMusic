@@ -20,7 +20,7 @@
         {% for (id, song, artist, album) in cursor %}
         <div class="li">
             <div class="leftli"> 
-                <a href="{{url_for('.play', id=id)}}">{{ song }}</a>
+                <a href="{{url_for('.play', id=id, song=song, artist=artist, album=album)}}">{{ song }}</a>
                 <div class="leftbottomli">
                     <span>{{artist}},</span>
                     <span>{{album}}</span>

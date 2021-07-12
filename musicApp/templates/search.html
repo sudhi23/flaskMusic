@@ -4,29 +4,41 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/search.css">
     <title>Music Manager</title>
 </head>
 <body>
-    <h1>Search</h1>
-    <form method="post">
+    <div class="h1">Manage Music</div>
+    <div class="h3">Search</div>
+    <div class="links">
+        <a href="{{url_for('home')}}">Home</a>
+    </div>
+    <form class="form" method="post">
         <input type="text" name="query" id="query" placeholder="Name">
         <select name="in" id="in">
             <option value="title">Song</option>
             <option value="artist">Artist</option>
             <option value="album">Album</option>
         </select><br>
-        <input type="submit" value="Search">
+        <input type="submit" id="search" value="Search">
     </form><br>
     {% if cursor %}
-    <ul>
+    <div class="ul">
         {% for (id, song, artist, album) in cursor %}
-        <li>
-            <a href="{{url_for('.play', id=id)}}">{{ song }}</a><br>
-            <span>{{artist}}</span><br>
-            <span>{{album}}</span><br>
-        </li>
+        <div class="li">
+            <div class="leftli"> 
+                <a href="{{url_for('.play', id=id, song=song, artist=artist, album=album)}}">{{ song }}</a>
+                <div class="leftbottomli">
+                    <span>{{artist}},</span>
+                    <span>{{album}}</span>
+                </div>
+            </div>
+            <div class="rightli">
+                <a href="{{url_for('.download', id=id, song=song)}}">Download</a>
+            </div>
+        </div>
         {% endfor %}
-    </ul>
+    </div>
     {% endif %}
 </body>
 </html>

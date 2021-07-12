@@ -4,15 +4,25 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/play.css">
     <title>Music Manager</title>
 </head>
 <body>
-    <h1>Playing</h1><br>
-    <audio controls>
-        <source src="../static/songs/{{id}}.mp3" type="audio/mpeg">
-    </audio><br>
-    <span></span>{{song}}<br>
-    <span></span>{{artist}}<br>
-    <span></span>{{album}}<br>
+    <div class="h1">Manage Music</div>
+    <div class="h3">Play</div>
+    <div class="links">
+        <a href="{{url_for('home')}}">Home</a>
+    </div>
+    <div class="maincontainer">
+        <div class="image"></div>
+        <span class="song">{{song}}</span>
+        <div class="details">
+            <span class="artist">{{artist}},</span>
+            <span class="album">{{album}}</span>
+        </div>
+        <audio controls>
+            <source src="../static/songs/{{id}}.mp3" type="audio/mpeg">
+        </audio>
+    </div>
 </body>
 </html>
