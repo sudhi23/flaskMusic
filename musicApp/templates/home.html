@@ -10,12 +10,14 @@
 
 <body>
     <h1>Home</h1>
+    <a href="{{url_for('upload')}}">Upload Song</a><br>
     <ul>
         {% for (id, song, artist, album) in cursor %}
         <li>
             <a href="{{url_for('.play', id=id)}}">{{ song }}</a><br>
             <span>{{artist}}</span><br>
             <span>{{album}}</span><br>
+            <a href="/delete/{{id}}">Delete</a>
         </li>
         {% endfor %}
     </ul>

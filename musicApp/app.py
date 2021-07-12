@@ -1,6 +1,8 @@
-from flask import Flask, render_template, request, url_for
+from flask import Flask, render_template, request, redirect,  url_for
+from flask.helpers import flash
 import mysql.connector
 from mysql.connector import errorcode
+import os
 
 DB_NAME = 'music'
 TABLE_NAME = 'songs'
@@ -53,7 +55,7 @@ for table_name in TABLES:
 
 app = Flask(__name__)
 
-@app.route('/home')
+@app.route('/home', methods=['GET'])
 def home():
     query = ("SELECT * FROM {} ".format(TABLE_NAME))
     cursor.execute(query)
@@ -68,21 +70,26 @@ def upload():
         data_song = list(request.form.values())
         cursor.execute(add_song, data_song)
         id = cursor.lastrowid
+        cnx.commit()
         f = request.files['file']
         f.save('static/songs/{}.mp3'.format(id))
     return render_template('uploadForm.html')
 
-@app.route('/play/<id>')
+@app.route('/play/<id>', methods=['GET'])
 def play(id):
     query = ("SELECT * FROM {} WHERE id = {} ".format(TABLE_NAME, id))
     cursor.execute(query)
     _, song, artist, album = list(cursor)[0]
     return render_template('play.html', id=id, song=song, artist=artist, album=album)
 
-with app.test_request_context():
-    print(url_for('play', id=1, details=('Madhurashtakam', 'Agam', 'Bhagwan')))
+@app.route('/delete/<id>', methods=['GET'])
+def delete(id):
+    query = ("DELETE FROM {} WHERE id = {} ".format(TABLE_NAME, id))
+    cursor.execute(query)
+    cnx.commit()
+    os.remove('static/songs/{}.mp3'.format(id))
+    return redirect(url_for('home'))
 
 app.run(debug=True)
-cnx.commit()
 cursor.close()
 cnx.close()

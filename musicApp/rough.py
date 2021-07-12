@@ -75,6 +75,9 @@ cursor = cnx.cursor(buffered=True)
 #for (id, song, artist, album) in cursor:
 #    print(id, song, artist, album)
 
-# cnx.commit()
-# cursor.close()
-# cnx.close()
+query = ("DELETE FROM {} WHERE id = {} ".format(TABLE_NAME, 4))
+cursor.execute(query)
+
+cnx.commit()
+cursor.close()
+cnx.close()
