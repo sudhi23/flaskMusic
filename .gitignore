@@ -1,3 +1,5 @@
-music/
+music/*
 musicApp/rough.py
-musicApp/static/songs/
+musicApp/static/songs/*
+musicApp/static/assets/*
+!musicApp/static/assets/0.jpg

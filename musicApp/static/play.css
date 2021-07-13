@@ -43,7 +43,7 @@
 }
 
 .maincontainer {
-  height: 65vh;
+  height: 68vh;
   font-family: monospace;
   display: flex;
   flex-direction: column;
@@ -52,6 +52,12 @@
 
 .image {
   flex: 0.65;
+  padding-left: 10vw;
+}
+
+.image > img {
+  border-radius: 20px;
+  height: 44vh;
 }
 
 .song {
@@ -70,4 +76,8 @@
   flex: 0.1;
   padding: 0 10vw;
   width: 70%;
+}
+
+a:hover {
+  color: rgb(112, 109, 109);
 }

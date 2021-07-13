@@ -76,3 +76,7 @@
   width: 50%;
   padding-left: 0;
 }
+
+a:hover {
+  color: rgb(112, 109, 109);
+}

@@ -95,3 +95,7 @@
   border: 1px solid black;
   border-radius: 20px;
 }
+
+a:hover {
+  color: rgb(112, 109, 109);
+}

@@ -1,2 +1,4 @@
 flask
 mysql-connector-python
+eyed3
+python-magic-bin    # required for eyed3 for windows

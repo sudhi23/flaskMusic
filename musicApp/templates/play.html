@@ -12,9 +12,16 @@
     <div class="h3">Play</div>
     <div class="links">
         <a href="{{url_for('home')}}">Home</a>
+        <a href="{{url_for('.download', id=id, song=song)}}">Download</a>
     </div>
     <div class="maincontainer">
-        <div class="image"></div>
+        <div class="image">
+            {% if exist %}
+            <img src="../static/assets/{{id}}.jpg" alt="Album image">
+            {% else %}
+            <img src="../static/assets/0.jpg" alt="Album image">
+            {% endif %}
+        </div>
         <span class="song">{{song}}</span>
         <div class="details">
             <span class="artist">{{artist}},</span>

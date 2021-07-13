@@ -1,10 +1,9 @@
 from flask import Flask, render_template, request, redirect,  url_for, send_from_directory, flash
 import mysql.connector
 from mysql.connector import errorcode
+import eyed3
 import os
-
-UPLOAD_FOLDER = 'static/songs'
-ALLOWED_EXTENSIONS = {'mp3'}
+from os import path
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -15,10 +14,10 @@ TABLE_NAME = 'songs'
 TABLES = {}
 TABLES['songs'] = (
     "CREATE TABLE `songs` ("
-    "  `id` int(11) NOT NULL AUTO_INCREMENT,"
-    "  `title` varchar(14) NOT NULL,"
-    "  `artist` varchar(16) NOT NULL,"
-    "  `album` varchar(16) NOT NULL,"
+    "  `id` int(10) NOT NULL AUTO_INCREMENT,"
+    "  `title` varchar(50) NOT NULL,"
+    "  `artist` varchar(50) NOT NULL,"
+    "  `album` varchar(50) NOT NULL,"
     "  PRIMARY KEY (`id`)"
     ") ENGINE=InnoDB")
 
@@ -58,8 +57,13 @@ for table_name in TABLES:
     else:
         print("OK")
 
+UPLOAD_FOLDER = 'static/songs'
+ASSETS_FOLDER = 'static/assets'
+ALLOWED_EXTENSIONS = {'mp3'}
+
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['ASSETS_FOLDER'] = ASSETS_FOLDER
 
 @app.route('/home', methods=['GET'])
 def home():
@@ -74,22 +78,31 @@ def upload():
         if 'file' not in request.files:
             return redirect(url_for('upload'))
         f = request.files['file']
-
-        add_song = ("INSERT INTO {} "
-               "(title, artist, album) "
-               "VALUES (%s, %s, %s)".format(TABLE_NAME))
-        data_song = list(request.form.values())
-        cursor.execute(add_song, data_song)
-        id = cursor.lastrowid
-        cnx.commit()
         
         # If the user does not select a file, the browser submits an
         # empty file without a filename.
         if f.filename == '':
             return redirect(url_for('upload'))
+        
         if f and allowed_file(f.filename):
+            add_song = ("INSERT INTO {} "
+                        "(title, artist, album) "
+                        "VALUES (%s, %s, %s)".format(TABLE_NAME))
+            data_song = list(request.form.values())
+            cursor.execute(add_song, data_song)
+            id = cursor.lastrowid
+
             f.save(os.path.join(app.config['UPLOAD_FOLDER'], '{}.mp3'.format(id)))
+            audio_file = eyed3.load(os.path.join(app.config['UPLOAD_FOLDER'], '{}.mp3'.format(id)))
+            for image in audio_file.tag.images:
+                image_file = open(os.path.join(app.config['ASSETS_FOLDER'], '{}.jpg'.format(id)), "wb")
+                image_file.write(image.image_data)
+                image_file.close()
+                break
+            
+            cnx.commit()
         return redirect(url_for('home'))
+    
     return render_template('uploadForm.html')
 
 @app.route('/play/<id>', methods=['GET'])
@@ -102,7 +115,12 @@ def play(id):
         query = ("SELECT * FROM {} WHERE id = {} ".format(TABLE_NAME, id))
         cursor.execute(query)
         _, song, artist, album = list(cursor)[0]
-    return render_template('play.html', id=id, song=song, artist=artist, album=album)
+    imgpath = os.path.join(app.config['ASSETS_FOLDER'], '{}.jpg'.format(id))
+    if path.exists(imgpath):
+        exist = True
+    else:
+        exist = False
+    return render_template('play.html', id=id, song=song, artist=artist, album=album, exist=exist)
 
 @app.route('/delete/<id>', methods=['GET'])
 def delete(id):
@@ -110,7 +128,9 @@ def delete(id):
     cursor.execute(query)
     cnx.commit()
     os.remove(os.path.join(app.config['UPLOAD_FOLDER'], '{}.mp3'.format(id)))
-    flash('Deleted')
+    imgpath = os.path.join(app.config['ASSETS_FOLDER'], '{}.jpg'.format(id))
+    if path.exists(imgpath):
+        os.remove(imgpath)
     return redirect(url_for('home'))
 
 @app.route('/search', methods=['GET', 'POST'])
