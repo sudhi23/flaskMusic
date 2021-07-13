@@ -5,8 +5,10 @@ import eyed3
 import os
 from os import path
 
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 DB_NAME = 'music'
 TABLE_NAME = 'songs'
@@ -23,7 +25,8 @@ TABLES['songs'] = (
 
 cnx = mysql.connector.connect(user='root')
 cursor = cnx.cursor(buffered=True)
-    
+
+
 def create_database(cursor):
     try:
         cursor.execute(
@@ -31,6 +34,7 @@ def create_database(cursor):
     except mysql.connector.Error as err:
         print("Failed creating database: {}".format(err))
         exit(1)
+
 
 try:
     cursor.execute("USE {}".format(DB_NAME))
@@ -65,11 +69,13 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['ASSETS_FOLDER'] = ASSETS_FOLDER
 
+
 @app.route('/home', methods=['GET'])
 def home():
     query = ("SELECT * FROM {} ".format(TABLE_NAME))
     cursor.execute(query)
     return render_template('home.html', cursor=cursor)
+
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
@@ -78,12 +84,12 @@ def upload():
         if 'file' not in request.files:
             return redirect(url_for('upload'))
         f = request.files['file']
-        
+
         # If the user does not select a file, the browser submits an
         # empty file without a filename.
         if f.filename == '':
             return redirect(url_for('upload'))
-        
+
         if f and allowed_file(f.filename):
             add_song = ("INSERT INTO {} "
                         "(title, artist, album) "
@@ -92,18 +98,22 @@ def upload():
             cursor.execute(add_song, data_song)
             id = cursor.lastrowid
 
-            f.save(os.path.join(app.config['UPLOAD_FOLDER'], '{}.mp3'.format(id)))
-            audio_file = eyed3.load(os.path.join(app.config['UPLOAD_FOLDER'], '{}.mp3'.format(id)))
+            f.save(os.path.join(
+                app.config['UPLOAD_FOLDER'], '{}.mp3'.format(id)))
+            audio_file = eyed3.load(os.path.join(
+                app.config['UPLOAD_FOLDER'], '{}.mp3'.format(id)))
             for image in audio_file.tag.images:
-                image_file = open(os.path.join(app.config['ASSETS_FOLDER'], '{}.jpg'.format(id)), "wb")
+                image_file = open(os.path.join(
+                    app.config['ASSETS_FOLDER'], '{}.jpg'.format(id)), "wb")
                 image_file.write(image.image_data)
                 image_file.close()
                 break
-            
+
             cnx.commit()
         return redirect(url_for('home'))
-    
+
     return render_template('uploadForm.html')
+
 
 @app.route('/play/<id>', methods=['GET'])
 def play(id):
@@ -122,6 +132,7 @@ def play(id):
         exist = False
     return render_template('play.html', id=id, song=song, artist=artist, album=album, exist=exist)
 
+
 @app.route('/delete/<id>', methods=['GET'])
 def delete(id):
     query = ("DELETE FROM {} WHERE id = {} ".format(TABLE_NAME, id))
@@ -133,18 +144,22 @@ def delete(id):
         os.remove(imgpath)
     return redirect(url_for('home'))
 
+
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     if request.method == 'POST':
-        query = ("SELECT * FROM {} WHERE {} = '{}' ".format(TABLE_NAME, request.form['in'], request.form['query']))
+        query = ("SELECT * FROM {} WHERE {} = '{}' ".format(TABLE_NAME,
+                                                            request.form['in'], request.form['query']))
         cursor.execute(query)
         return render_template('search.html', cursor=cursor)
-    return render_template('search.html', cursor=None)
+    return render_template('search.html')
+
 
 @app.route('/download/<id>', methods=['GET'])
 def download(id):
-    return send_from_directory(app.config['UPLOAD_FOLDER'],'{}.mp3'.format(id), as_attachment = True, download_name='{}.mp3'.format(request.args['song']))
+    return send_from_directory(app.config['UPLOAD_FOLDER'], '{}.mp3'.format(id), as_attachment=True, download_name='{}.mp3'.format(request.args['song']))
 
-app.run(debug=True)
+
+app.run()
 cursor.close()
 cnx.close()

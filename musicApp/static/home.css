@@ -41,7 +41,7 @@
 .ul {
   display: flex;
   flex-direction: column;
-  height: 60vh;
+  height: 64vh;
   padding: 2vh 10vw;
   overflow: scroll;
   /* Hide scrollbar for IE, Edge and Firefox */
@@ -55,7 +55,7 @@
 }
 
 .li {
-  flex: 0.2;
+  flex: 0.18;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
