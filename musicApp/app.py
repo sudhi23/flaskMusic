@@ -160,6 +160,11 @@ def download(id):
     return send_from_directory(app.config['UPLOAD_FOLDER'], '{}.mp3'.format(id), as_attachment=True, download_name='{}.mp3'.format(request.args['song']))
 
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return redirect(url_for('home'))
+
+
 app.run()
 cursor.close()
 cnx.close()
